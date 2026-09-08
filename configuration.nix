@@ -35,11 +35,16 @@
     onActivation.autoUpdate = true;
     onActivation.extraFlags = [ "--force" ];
     brews = [
-      "herdr"           # tmux for agents
+      # GenAI
+      "herdr"                 # tmux for agents
+      "llmfit"                # your hardware, every local model, ranked
+      "youssofal/mtplx/mtplx" # fastest way to run Qwen models on macOs
+
       "gh"              # GitHub CLI
       "ca-certificates" # required for node
       "node"
       "go"
+      "uv"              # Python: https://github.com/astral-sh/uv
 
       # Common shell / systems tools
       "wget"

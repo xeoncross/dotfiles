@@ -19,7 +19,7 @@
       "apiKey": "lmstudio",
       "models": [
         { "id": "qwen/qwen3.6-35b-a3b" },
-        { "id": "qwen/qwen3.6-27b" }
+        { "id": "qwen/qwen3.8-27b" }
       ]
     }
   }

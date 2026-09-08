@@ -112,14 +112,14 @@ in
       # mkdir -p "$NPM_CONFIG_PREFIX"
 
       echo "Installing global npm packages via Homebrew Node..."
-      $DRY_RUN_CMD "$NPM_PATH" install -g skills gh-axi chrome-devtools-axi gnhf
+      $DRY_RUN_CMD "$NPM_PATH" install -g -y skills gh-axi chrome-devtools-axi gnhf
     else
       echo "Warning: Homebrew npm not found at $NPM_PATH yet. Skipping."
     fi
 
     if [ -x "$NPX_PATH" ]; then
       export PATH="$BREW_BIN:$PATH"
-      $DRY_RUN_CMD "$NPX_PATH" skills add kunchenguid/lavish-axi --skill lavish
+      $DRY_RUN_CMD "$NPX_PATH" skills add kunchenguid/lavish-axi --skill lavish -y
 
       # report installed skills
       "$NPX_PATH" skills list -g
