@@ -7,7 +7,7 @@
     "showTerminalProgress": true
   },
   "hideThinkingBlock": true,
-  "quietStartup": true,
+  "quietStartup": false,
   "theme": "rose-pine-moon",
   "steeringMode": "all",
   "followUpMode": "all",
