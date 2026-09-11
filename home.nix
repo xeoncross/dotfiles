@@ -88,6 +88,15 @@ in
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
   home.file.".config/opencode/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
+  # Pi
+  home.file.".pi/agent/AGENTS.md" = {
+    source = config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
+    force = true;
+  };
+
+  # Other agents
+  home.file.".config/agents/AGENTS.md".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
 
   # VSCode
   home.file."Library/Application Support/Code/User/settings.json".source =
@@ -115,16 +124,6 @@ in
       $DRY_RUN_CMD "$NPM_PATH" install -g -y skills gh-axi chrome-devtools-axi gnhf
     else
       echo "Warning: Homebrew npm not found at $NPM_PATH yet. Skipping."
-    fi
-
-    if [ -x "$NPX_PATH" ]; then
-      export PATH="$BREW_BIN:$PATH"
-      $DRY_RUN_CMD "$NPX_PATH" skills add kunchenguid/lavish-axi --skill lavish -y
-
-      # report installed skills
-      "$NPX_PATH" skills list -g
-    else
-      echo "Warning: Homebrew npx not found at $NPX_PATH yet. Skipping."
     fi
 
     # also install the no-mistakes binary
