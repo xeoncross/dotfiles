@@ -39,6 +39,7 @@
       "herdr"                 # tmux for agents
       "llmfit"                # your hardware, every local model, ranked
       "youssofal/mtplx/mtplx" # fastest way to run Qwen models on macOs
+      "oleksandrchekhovskyi/hax/hax" # lighest agent harness I've found
 
       "gh"              # GitHub CLI
       "ca-certificates" # required for node
