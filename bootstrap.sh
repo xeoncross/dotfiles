@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# Takes a fresh Mac from nothing to a fully configured machine.
-# Run this once. After it finishes, use ./rebuild.sh for every later change.
+# Sets up this Mac from the repo. Idempotent: re-run it after any change.
 set -euo pipefail
-
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
 if [ -e /opt/homebrew/.managed_by_nix_darwin ]; then
@@ -10,17 +8,7 @@ if [ -e /opt/homebrew/.managed_by_nix_darwin ]; then
   exit 1
 fi
 
-echo "==> Step 1: Homebrew and everything in Brewfile"
-# The official Homebrew installer also installs the Xcode Command Line Tools.
 "$DIR/scripts/homebrew.sh"
-
-echo "==> Step 2: symlink ~/.dotfiles and the config files"
 "$DIR/scripts/links.sh"
-
-echo "==> Step 3: npm and go packages"
 "$DIR/scripts/packages.sh"
-
-echo "==> Step 4: macOS settings"
 "$DIR/scripts/macos.sh"
-
-echo "==> Done. Open a new terminal, then use ./rebuild.sh for future changes."

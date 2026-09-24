@@ -49,51 +49,35 @@ cd dotfiles
 ```
 
 Before you run it: review "Make it yours" below, especially the Homebrew cleanup warning.
-`bootstrap.sh` applies the config to your machine, so do this first.
 
 ```sh
 ./bootstrap.sh
 ```
 
-`bootstrap.sh` does these things, in order:
+`bootstrap.sh` is idempotent: run it on a fresh Mac, and again after every change. It runs, in order:
 
 1. Runs `scripts/homebrew.sh`: installs Homebrew with the official installer (which also installs the Xcode Command Line Tools) if it's missing, then installs everything in `Brewfile`.
-2. Runs `scripts/links.sh`: symlinks this repo to `~/.dotfiles`, then symlinks the config files under `home/` into your home folder.
+2. Runs `scripts/links.sh`: symlinks the config files under `home/` into your home folder.
 3. Runs `scripts/packages.sh`: global npm packages and `go install` tools.
 4. Runs `scripts/macos.sh`: macOS settings, then restarts Dock and Finder.
    Key repeat changes may need a log out and back in.
 
 Open a new terminal afterwards so the new `~/.zshrc` loads.
 
-### Validate without applying
-
-Every script accepts `DRY_RUN=1` to print what it would change without changing anything:
-
-```sh
-DRY_RUN=1 ./rebuild.sh
-```
-
 ## Daily use
 
-Edit the config files in place, then apply:
+Edit the files in place, then re-run `./bootstrap.sh`, or just the script for what you changed (for example `scripts/homebrew.sh` after editing `Brewfile`).
 
-```sh
-./rebuild.sh
-```
-
-That re-runs `scripts/homebrew.sh`, `scripts/links.sh`, `scripts/packages.sh`, and `scripts/macos.sh`.
-Each script also runs on its own when you only changed one thing, for example `scripts/homebrew.sh` after editing `Brewfile`.
-
-To add a package, add a line to `Brewfile` (`brew`, `cask`, `tap`, or `vscode` for a VS Code extension) and run `./rebuild.sh`.
-Don't `brew install` things ad-hoc: the next rebuild removes anything not in `Brewfile` (see the cleanup warning below).
+To add a package, add a line to `Brewfile` (`brew`, `cask`, `tap`, or `vscode` for a VS Code extension).
+Don't `brew install` things ad-hoc: the next run removes anything not in `Brewfile` (see the cleanup warning below).
 
 Removing a line from `scripts/macos.sh` does not revert that setting; change it back by hand or with an explicit `defaults write`.
 
 ## Migrating from the Nix version
 
 Earlier versions of this repo used nix-darwin, home-manager, nix-homebrew, and Determinate Nix.
-`bootstrap.sh` and `rebuild.sh` refuse to run while `/opt/homebrew/.managed_by_nix_darwin` exists.
-Migrate once, from `~/.dotfiles` after pulling the new version:
+`bootstrap.sh` refuses to run while `/opt/homebrew/.managed_by_nix_darwin` exists.
+Migrate once, after pulling the new version:
 
 ```sh
 DRY_RUN=1 ./uninstall_nix.sh   # preview
@@ -108,7 +92,7 @@ DRY_RUN=1 ./uninstall_nix.sh   # preview
 4. Runs Determinate's `/nix/nix-installer uninstall`, which removes `/nix`, then the per-user `~/.nix-profile`, `~/.nix-defexpr`, and `~/.local/state/nix`.
 
 The Nix-installed CLI tools (nvim, rg, fd, starship, VS Code, and so on) are gone until the next step.
-Open a new terminal and run `./rebuild.sh` to install them from `Brewfile` and create the new links.
+Open a new terminal and run `./bootstrap.sh` to install them from `Brewfile` and create the new links.
 
 ## Make it yours
 
@@ -123,9 +107,9 @@ Git will stop your first commit and tell you to set them (`git config --global u
 If you'd rather keep it in the repo, add a `home/.gitconfig` with your identity and a matching `link` line in `scripts/links.sh`.
 
 **Homebrew cleanup warning:** `scripts/homebrew.sh` runs `brew bundle cleanup --force --zap`.
-That means every time you run `bootstrap.sh` or `rebuild.sh`, Homebrew removes any formula, cask, or tap on your machine that isn't listed in `Brewfile`, and zaps the removed casks' app data.
+That means every time you run `bootstrap.sh` or `scripts/homebrew.sh`, Homebrew removes any formula, cask, or tap on your machine that isn't listed in `Brewfile`, and zaps the removed casks' app data.
 If you already have Homebrew stuff installed that isn't in that file, the first run will uninstall it.
-Run `DRY_RUN=1 scripts/homebrew.sh` to see what would be removed, and add anything you want to keep to `Brewfile` before your first real run.
+Run `brew bundle cleanup --file Brewfile` (without `--force` it only lists) to see what would be removed, and add anything you want to keep to `Brewfile` before your first real run.
 
 **About `herdr`:** it's in `Brewfile`.
 It's a real public Homebrew formula (`brew info herdr` finds it in homebrew-core, no tap needed), so it will install fine.
@@ -142,21 +126,19 @@ If you don't use it, just remove it from `Brewfile` in your copy.
 
 - `Brewfile` - every Homebrew formula, cask, tap, and VS Code extension. This is where packages go.
 - `scripts/homebrew.sh` - installs Homebrew if needed, then makes the machine match `Brewfile`.
-- `scripts/links.sh` - symlinks `~/.dotfiles` and the files under `home/` into place.
+- `scripts/links.sh` - symlinks the files under `home/` into place.
 - `scripts/packages.sh` - global npm packages and `go install` tools.
 - `scripts/macos.sh` - macOS system settings via `defaults write`.
-- `bootstrap.sh` - one-time setup for a fresh Mac.
+- `bootstrap.sh` - runs all of the scripts above. Use it for a fresh Mac and after every change.
 - `uninstall_nix.sh` - one-time migration off the old Nix version of this repo.
-- `rebuild.sh` - re-applies everything after the first run.
-  Run this every time you make a change.
 - `home/` - the actual config files that get symlinked into place; the sections below explain the shared symlink model and Pi's narrower selective setup.
 
 ## How the symlinks work
 
 The files under `home/` are the real files - editing them here is editing your live config, no rebuild needed to see the change.
-`scripts/links.sh` points paths like `~/.config/nvim` at `~/.dotfiles/home/.config/nvim`, and `~/.dotfiles` points at this repo, so the two never drift out of sync.
+`scripts/links.sh` points paths like `~/.config/nvim` straight at `home/.config/nvim` in this repo, so the two never drift out of sync.
 If a real file is already in the way, `links.sh` moves it to `<name>.backup-<timestamp>` first.
-You only need to run `scripts/links.sh` (or `./rebuild.sh`) when you add a new link.
+Re-run it when you add a link or move the repo.
 
 ## Optional Pi configuration
 

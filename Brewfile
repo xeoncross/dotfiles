@@ -11,7 +11,6 @@ brew "youssofal/mtplx/mtplx" # fastest way to run Qwen models on macOs
 brew "oleksandrchekhovskyi/hax/hax" # lighest agent harness I've found
 
 brew "gh"              # GitHub CLI
-brew "ca-certificates" # required for node
 brew "node"
 brew "go"
 brew "uv"              # Python: https://github.com/astral-sh/uv

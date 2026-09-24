@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # One-time migration off the old Nix version of this repo
 # (nix-darwin + home-manager + nix-homebrew + Determinate Nix).
-# Afterwards, open a new terminal and run ./rebuild.sh.
+# Afterwards, open a new terminal and run ./bootstrap.sh.
 # DRY_RUN=1 prints what would happen without changing anything.
 set -euo pipefail
 
@@ -84,4 +84,4 @@ fi
 # Per-user Nix leftovers that pointed into /nix
 remove "$HOME/.nix-profile" "$HOME/.nix-defexpr" "$HOME/.local/state/nix"
 
-echo "==> Done. Open a new terminal, then run ./rebuild.sh."
+echo "==> Done. Open a new terminal, then run ./bootstrap.sh."
