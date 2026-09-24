@@ -14,7 +14,7 @@ Please use the bug report template and include:
 - What happened.
 - What you expected to happen.
 - Steps to reproduce the problem.
-- Your environment, including macOS, Linux, or WSL and any relevant Nix or home-manager generation details.
+- Your environment, including macOS, Linux, or WSL and any relevant Homebrew version details.
 
 ## Feature Ideas
 

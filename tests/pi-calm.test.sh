@@ -8,7 +8,7 @@
 # Coverage:
 # - zero coupling: no forbidden identifiers anywhere in the shipped source,
 #   tests, or docs, and the runtime state file is never tracked or managed;
-# - static wiring: Home Manager auto-load, TypeScript typecheck, JS syntax;
+# - static wiring: scripts/links.sh auto-load, TypeScript typecheck, JS syntax;
 # - preference: off by default, persisted toggle, malformed/unwritable state;
 # - filtering: the seven built-in tool shells hide gaplessly while custom tools
 #   and unsupported transcript classes stay visible, /export and /share render
@@ -103,7 +103,7 @@ test_zero_coupling_and_state_file() {
   local pat_watch="fm_""watch_arm_pi" pat_op="FIRSTMATE""_OP" pat_dash="fm-""calm"
 
   # The operational marker and upstream runtime surfaces must not exist anywhere.
-  for file in $source_files "$ROOT/tests/pi-calm.test.sh" "$ROOT/tests/lib.sh" "$ROOT/README.md" "$ROOT/home.nix"; do
+  for file in $source_files "$ROOT/tests/pi-calm.test.sh" "$ROOT/tests/lib.sh" "$ROOT/README.md" "$ROOT/scripts/links.sh"; do
 
     assert_not_contains "$(cat "$file")" "$pat_fm_home" "$file mentions $pat_fm_home"
     assert_not_contains "$(cat "$file")" "$pat_fm_root" "$file mentions $pat_fm_root"
@@ -115,7 +115,7 @@ test_zero_coupling_and_state_file() {
   done
   # The upstream project name may appear only in a license attribution.
   local attribution_name="First""mate"
-  license_hits=$(grep -rni "$attribution_name" "$CALM_DIR" "$ROOT/README.md" "$ROOT/home.nix" 2>/dev/null | grep -v "Adapted from" || true)
+  license_hits=$(grep -rni "$attribution_name" "$CALM_DIR" "$ROOT/README.md" "$ROOT/scripts/links.sh" 2>/dev/null | grep -v "Adapted from" || true)
   [ -z "$license_hits" ] || fail "unexpected upstream references outside license attribution: $license_hits"
   grep -q "MIT License" "$CALM_DIR/LICENSE" || fail "calm LICENSE lost the MIT permission text"
   grep -q "Copyright (c) 2026 Kun Chen" "$CALM_DIR/LICENSE" || fail "calm LICENSE lost the copyright notice"
@@ -123,11 +123,11 @@ test_zero_coupling_and_state_file() {
     grep -q "Copyright (c) 2026 Kun Chen" "$file" || fail "$file lost its copyright attribution header"
   done
 
-  # The runtime preference file must never be tracked or Home Manager managed.
+  # The runtime preference file must never be tracked or symlinked by links.sh.
   if git -C "$ROOT" ls-files --error-unmatch home/.pi/agent/calm >/dev/null 2>&1; then
     fail "the Calm state file is tracked in the repository"
   fi
-  assert_not_contains "$(cat "$ROOT/home.nix")" '.pi/agent/calm' "home.nix manages the Calm state file"
+  assert_not_contains "$(cat "$ROOT/scripts/links.sh")" '.pi/agent/calm' "scripts/links.sh manages the Calm state file"
   grep -q '^/home/.pi/agent/calm$' "$ROOT/.gitignore" \
     || fail ".gitignore does not guard /home/.pi/agent/calm"
 
@@ -140,12 +140,10 @@ test_zero_coupling_and_state_file() {
 }
 
 test_static_typescript_and_repo_wiring() {
-  # Home Manager links the extensions directory as a whole, so the calm
+  # scripts/links.sh links the extensions directory as a whole, so the calm
   # subdirectory auto-loads without any new declaration.
-  grep -q 'home.file.".pi/agent/extensions".source =' "$ROOT/home.nix" \
-    || fail "home.nix no longer links ~/.pi/agent/extensions as a directory"
-  grep -q "mkOutOfStoreSymlink \"\${dotfiles}/home/.pi/agent/extensions\"" "$ROOT/home.nix" \
-    || fail "home.nix changed the Pi extensions link target"
+  grep -Eq '^link "\$H/\.pi/agent/extensions"[[:space:]]+"\$HOME/\.pi/agent/extensions"$' "$ROOT/scripts/links.sh" \
+    || fail "scripts/links.sh no longer links ~/.pi/agent/extensions to home/.pi/agent/extensions as a directory"
   [ -f "$CALM_DIR/index.ts" ] || fail "calm extension entry point missing"
   [ -f "$CALM_DIR/LICENSE" ] || fail "calm license file missing"
 
@@ -183,7 +181,7 @@ JSON
       || fail "Pi Calm extension does not typecheck under strict TypeScript"
   fi
 
-  pass "static wiring: Home Manager auto-load intact, TypeScript typechecks, existing JS extension parses"
+  pass "static wiring: scripts/links.sh auto-load intact, TypeScript typechecks, existing JS extension parses"
 }
 
 test_preference_and_command() {
