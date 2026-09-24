@@ -12,6 +12,7 @@
         saoudrizwan.claude-dev    # Cline for local agents
         shd101wyy.markdown-preview-enhanced
         jnoortheen.nix-ide        # nix language server
+	humao.rest-client         # http client inside vscode
       ];
     })
   ];

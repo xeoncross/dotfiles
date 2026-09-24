@@ -43,6 +43,7 @@ in
       cc = "claude --dangerously-skip-permissions";
       co = "codex --full-auto";
       server = "python3 -m http.server 8080";
+      cloc = "cloc --vcs=git"; # use .gitignore to skip non-source files
       # run models all night / clamshell without letting the computer sleep
       preventsleep = "sudo pmset -b sleep 0; sudo pmset -b disablesleep 1";
       enablesleep = "sudo pmset -b sleep 30; sudo pmset -b disablesleep 0";

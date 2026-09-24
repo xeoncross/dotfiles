@@ -1,5 +1,4 @@
 {
-  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -39,7 +38,8 @@
     "command": "input=$(cat); model=$(echo \"$input\" | jq -r '.model.display_name'); used=$(echo \"$input\" | jq -r '.context_window.used_percentage // empty'); if [ -n \"$used\" ]; then printf \"%s | ctx: %.0f%% used\" \"$model\" \"$used\"; else printf \"%s\" \"$model\"; fi"
   },
   "enabledPlugins": {
-    "modern-go-guidelines@goland-claude-marketplace": true
+    "modern-go-guidelines@goland-claude-marketplace": true,
+    "typesafe@typesafe-ai": true
   },
   "extraKnownMarketplaces": {
     "goland-claude-marketplace": {
@@ -47,9 +47,17 @@
         "source": "github",
         "repo": "JetBrains/go-modern-guidelines"
       }
+    },
+    "typesafe-ai": {
+      "source": {
+        "source": "github",
+        "repo": "typesafe-ai/skills"
+      }
     }
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark-ansi"
+  "theme": "dark-ansi",
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true
 }
